@@ -4,6 +4,7 @@ import {
   CanvasContainer,
   GarmentTypeSelector,
   GarmentColorSelector,
+  ImageManagerPanel,
 } from "@/features/designer";
 
 function ComingSoon({ label }: { label: string }) {
@@ -17,7 +18,14 @@ function ComingSoon({ label }: { label: string }) {
 export default function DesignerPage() {
   return (
     <DesignerLayout
-      toolbar={<Toolbar />}
+      toolbar={
+        <div className="flex h-full flex-col overflow-y-auto">
+          <ImageManagerPanel />
+          <div className="border-t border-black/[.08] dark:border-white/[.1]">
+            <Toolbar />
+          </div>
+        </div>
+      }
       canvas={<CanvasContainer />}
       panels={{
         Layers: <ComingSoon label="Layers" />,
