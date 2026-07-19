@@ -10,5 +10,21 @@ export const GARMENT_COLORS = [
 ] as const;
 
 export const GARMENT_TYPES = [
-  { id: "tshirt", name: "Classic T-Shirt" },
+  { id: "tshirt", name: "Classic T-Shirt", mockupFolder: "tshirt" },
 ] as const;
+
+type GarmentTypeId = (typeof GARMENT_TYPES)[number]["id"];
+type GarmentColorSlug = (typeof GARMENT_COLORS)[number]["slug"];
+
+// Mockup images live at public/garments/<mockupFolder>/<side>-<colorSlug>.png
+export function getGarmentMockupUrl(
+  garmentTypeId: GarmentTypeId,
+  colorSlug: GarmentColorSlug,
+  side: "front" | "back",
+) {
+  const type = GARMENT_TYPES.find((t) => t.id === garmentTypeId);
+  if (!type) {
+    throw new Error(`Unknown garment type: ${garmentTypeId}`);
+  }
+  return `/garments/${type.mockupFolder}/${side}-${colorSlug}.png`;
+}
