@@ -3,6 +3,7 @@ import {
   Toolbar,
   CanvasContainer,
   GarmentTypeSelector,
+  GarmentColorSelector,
 } from "@/features/designer";
 
 function ComingSoon({ label }: { label: string }) {
@@ -21,7 +22,12 @@ export default function DesignerPage() {
       panels={{
         Layers: <ComingSoon label="Layers" />,
         Properties: <ComingSoon label="Properties" />,
-        Garment: <GarmentTypeSelector />,
+        Garment: (
+          <div className="flex flex-col gap-6">
+            <GarmentTypeSelector />
+            <GarmentColorSelector />
+          </div>
+        ),
       }}
     />
   );
