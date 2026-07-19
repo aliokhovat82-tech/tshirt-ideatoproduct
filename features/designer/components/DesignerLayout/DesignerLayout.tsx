@@ -2,16 +2,8 @@
 
 import { useState } from "react";
 
-const PANEL_TABS = ["Layers", "Properties", "Garment"] as const;
-type PanelTab = (typeof PANEL_TABS)[number];
-
-function PanelTabContent({ tab }: { tab: PanelTab }) {
-  return (
-    <p className="p-4 text-sm text-zinc-500 dark:text-zinc-400">
-      {tab} panel — coming soon.
-    </p>
-  );
-}
+export const PANEL_TABS = ["Layers", "Properties", "Garment"] as const;
+export type PanelTab = (typeof PANEL_TABS)[number];
 
 function PanelTabs({
   activeTab,
@@ -43,9 +35,11 @@ function PanelTabs({
 export function DesignerLayout({
   toolbar,
   canvas,
+  panels,
 }: {
   toolbar: React.ReactNode;
   canvas: React.ReactNode;
+  panels: Record<PanelTab, React.ReactNode>;
 }) {
   const [activeTab, setActiveTab] = useState<PanelTab>("Layers");
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -60,7 +54,7 @@ export function DesignerLayout({
 
       <div className="hidden w-80 shrink-0 flex-col border-l border-black/[.08] lg:flex dark:border-white/[.1]">
         <PanelTabs activeTab={activeTab} onChange={setActiveTab} />
-        <PanelTabContent tab={activeTab} />
+        <div className="p-4">{panels[activeTab]}</div>
       </div>
 
       <div className="flex border-t border-black/[.08] lg:hidden dark:border-white/[.1]">
@@ -89,7 +83,7 @@ export function DesignerLayout({
           />
           <div className="bg-background absolute inset-x-0 bottom-0 rounded-t-2xl shadow-lg">
             <PanelTabs activeTab={activeTab} onChange={setActiveTab} />
-            <PanelTabContent tab={activeTab} />
+            <div className="p-4">{panels[activeTab]}</div>
           </div>
         </div>
       )}
