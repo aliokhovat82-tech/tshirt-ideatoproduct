@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Stage, Layer, Text } from "react-konva";
+import { Stage, Layer, Image as KonvaImage } from "react-konva";
+import type Konva from "konva";
+import { useHtmlImage } from "@/features/designer/hooks/useHtmlImage";
 
 // Garment mockups are 2000x2000px (docs/SPECS.md §1), so the artboard
 // keeps a 1:1 aspect ratio. Stage size tracks the box's actual rendered
@@ -10,7 +12,9 @@ import { Stage, Layer, Text } from "react-konva";
 // during SSR.
 export function CanvasContainer() {
   const boxRef = useRef<HTMLDivElement>(null);
+  const imageNodeRef = useRef<Konva.Image>(null);
   const [size, setSize] = useState(0);
+  const garmentImage = useHtmlImage("/garments/tshirt/front-white.png");
 
   useEffect(() => {
     const el = boxRef.current;
@@ -23,6 +27,13 @@ export function CanvasContainer() {
     return () => window.removeEventListener("resize", measure);
   }, []);
 
+  // The garment image loads asynchronously; Konva doesn't always repaint
+  // on its own once the <Image> node's image prop changes, so force a
+  // redraw once it's ready.
+  useEffect(() => {
+    imageNodeRef.current?.getLayer()?.draw();
+  }, [garmentImage, size]);
+
   return (
     <div className="flex flex-1 items-center justify-center overflow-auto bg-zinc-100 p-6 dark:bg-zinc-900">
       <div
@@ -32,15 +43,14 @@ export function CanvasContainer() {
         {size > 0 && (
           <Stage width={size} height={size}>
             <Layer>
-              <Text
-                text="Canvas"
-                x={0}
-                y={size / 2 - 8}
-                width={size}
-                align="center"
-                fontSize={16}
-                fill="#a1a1aa"
-              />
+              {garmentImage && (
+                <KonvaImage
+                  ref={imageNodeRef}
+                  image={garmentImage}
+                  width={size}
+                  height={size}
+                />
+              )}
             </Layer>
           </Stage>
         )}
