@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { Stage, Layer, Image as KonvaImage } from "react-konva";
 import type Konva from "konva";
 import { useHtmlImage } from "@/features/designer/hooks/useHtmlImage";
+import { useDesignerStore } from "@/stores/designerStore";
+import { getGarmentMockupUrl } from "@/constants/garments";
+import type { Side } from "@/stores/designerStore";
 
-const SIDES = ["front", "back"] as const;
-type Side = (typeof SIDES)[number];
+const SIDES: Side[] = ["front", "back"];
 
 // Garment mockups are 2000x2000px (docs/SPECS.md §1), so the artboard
 // keeps a 1:1 aspect ratio. Stage size tracks the box's actual rendered
@@ -17,9 +19,14 @@ export function CanvasContainer() {
   const boxRef = useRef<HTMLDivElement>(null);
   const imageNodeRef = useRef<Konva.Image>(null);
   const [size, setSize] = useState(0);
-  const [side, setSide] = useState<Side>("front");
-  // Color is fixed at white until garment color selection (Phase 4).
-  const garmentImage = useHtmlImage(`/garments/tshirt/${side}-white.png`);
+
+  const garmentTypeId = useDesignerStore((s) => s.garmentTypeId);
+  const garmentColorSlug = useDesignerStore((s) => s.garmentColorSlug);
+  const side = useDesignerStore((s) => s.side);
+  const setSide = useDesignerStore((s) => s.setSide);
+
+  const mockupUrl = getGarmentMockupUrl(garmentTypeId, garmentColorSlug, side);
+  const garmentImage = useHtmlImage(mockupUrl);
 
   useEffect(() => {
     const el = boxRef.current;
