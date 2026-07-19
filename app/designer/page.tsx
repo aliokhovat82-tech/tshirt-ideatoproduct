@@ -27,6 +27,7 @@ export default function DesignerPage() {
         </div>
       }
       canvas={<CanvasContainer />}
+      mobileExtraTabs={[{ label: "Images", content: <ImageManagerPanel /> }]}
       panels={{
         Layers: <ComingSoon label="Layers" />,
         Properties: <ComingSoon label="Properties" />,

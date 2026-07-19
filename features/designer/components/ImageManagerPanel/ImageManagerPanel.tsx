@@ -4,11 +4,11 @@ import { useState } from "react";
 import { ImageUploader } from "@/components/ImageUploader/ImageUploader";
 import { validateImageFile } from "@/features/designer/utils/validateImageFile";
 import { useAssetsStore } from "@/stores/assetsStore";
+import { AssetLibrary } from "@/features/designer/components/AssetLibrary/AssetLibrary";
 
 const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
 export function ImageManagerPanel() {
-  const assetCount = useAssetsStore((s) => s.assets.length);
   const addAsset = useAssetsStore((s) => s.addAsset);
   const [rejections, setRejections] = useState<string[]>([]);
 
@@ -45,11 +45,7 @@ export function ImageManagerPanel() {
         multiple
         onFilesSelected={handleFiles}
       />
-      {assetCount > 0 && (
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          {assetCount} image{assetCount === 1 ? "" : "s"} uploaded
-        </p>
-      )}
+      <AssetLibrary />
       {rejections.length > 0 && (
         <ul className="flex flex-col gap-1">
           {rejections.map((reason, i) => (
