@@ -1,0 +1,8 @@
+node_modules
+.next
+docs
+public
+CLAUDE.md
+START-HERE.md
+AGENTS.md
+package-lock.json
