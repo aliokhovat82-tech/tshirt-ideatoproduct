@@ -1,7 +1,16 @@
+import { DesignerLayout } from "@/features/designer";
+
 export default function DesignerPage() {
   return (
-    <div className="flex flex-1 items-center justify-center">
-      <p className="text-zinc-600 dark:text-zinc-400">Designer workspace</p>
-    </div>
+    <DesignerLayout
+      toolbar={
+        <p className="p-4 text-sm text-zinc-500 dark:text-zinc-400">Toolbar</p>
+      }
+      canvas={
+        <div className="flex flex-1 items-center justify-center text-zinc-500 dark:text-zinc-400">
+          Canvas
+        </div>
+      }
+    />
   );
 }
