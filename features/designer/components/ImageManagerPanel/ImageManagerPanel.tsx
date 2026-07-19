@@ -8,18 +8,26 @@ const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 export function ImageManagerPanel() {
   // Temporary: just proves the upload flow works end to end.
   // Task 26 replaces this with the real assets store.
-  const [lastFileName, setLastFileName] = useState<string | null>(null);
+  const [selectedNames, setSelectedNames] = useState<string[]>([]);
 
   return (
     <div className="flex flex-col gap-2 p-3">
       <ImageUploader
         accept={ACCEPTED_TYPES}
-        onFilesSelected={(files) => setLastFileName(files[0]?.name ?? null)}
+        multiple
+        onFilesSelected={(files) => setSelectedNames(files.map((f) => f.name))}
       />
-      {lastFileName && (
-        <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-          Selected: {lastFileName}
-        </p>
+      {selectedNames.length > 0 && (
+        <ul className="flex flex-col gap-0.5">
+          {selectedNames.map((name, i) => (
+            <li
+              key={`${name}-${i}`}
+              className="truncate text-xs text-zinc-500 dark:text-zinc-400"
+            >
+              Selected: {name}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
