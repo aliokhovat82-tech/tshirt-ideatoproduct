@@ -7,6 +7,9 @@ import { useHtmlImage } from "@/features/designer/hooks/useHtmlImage";
 import { useDesignerStore } from "@/stores/designerStore";
 import { getGarmentMockupUrl } from "@/constants/garments";
 import type { Side } from "@/stores/designerStore";
+import { useCanvasStore } from "@/stores/canvasStore";
+import { useAssetsStore } from "@/stores/assetsStore";
+import { PlacedObject } from "@/features/designer/components/CanvasContainer/PlacedObject";
 
 const SIDES: Side[] = ["front", "back"];
 
@@ -24,6 +27,9 @@ export function CanvasContainer() {
   const garmentColorSlug = useDesignerStore((s) => s.garmentColorSlug);
   const side = useDesignerStore((s) => s.side);
   const setSide = useDesignerStore((s) => s.setSide);
+
+  const objects = useCanvasStore((s) => s.objects);
+  const assets = useAssetsStore((s) => s.assets);
 
   const mockupUrl = getGarmentMockupUrl(garmentTypeId, garmentColorSlug, side);
   const garmentImage = useHtmlImage(mockupUrl);
@@ -80,6 +86,18 @@ export function CanvasContainer() {
                   height={size}
                 />
               )}
+              {objects.map((object) => {
+                const asset = assets.find((a) => a.id === object.assetId);
+                if (!asset) return null;
+                return (
+                  <PlacedObject
+                    key={object.id}
+                    object={object}
+                    asset={asset}
+                    size={size}
+                  />
+                );
+              })}
             </Layer>
           </Stage>
         )}
