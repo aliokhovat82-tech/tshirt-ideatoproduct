@@ -147,7 +147,6 @@ export function CanvasContainer() {
               })}
               <Transformer
                 ref={transformerRef}
-                rotateEnabled={false}
                 boundBoxFunc={(oldBox, newBox) =>
                   newBox.width < MIN_TRANSFORM_SIZE ||
                   newBox.height < MIN_TRANSFORM_SIZE
