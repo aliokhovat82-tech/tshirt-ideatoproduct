@@ -2,6 +2,7 @@ import type { ImageOperation } from "@/features/image-processing/types/ImageOper
 import { getBackgroundRemovalProvider } from "@/features/image-processing/services/backgroundRemoval/getBackgroundRemovalProvider";
 import { applyCrop } from "@/features/image-processing/utils/applyCrop";
 import { applyBrightness } from "@/features/image-processing/utils/applyBrightness";
+import { applyContrast } from "@/features/image-processing/utils/applyContrast";
 
 function sourceToCanvas(source: HTMLImageElement): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
@@ -36,6 +37,8 @@ export async function applyImageOperations(
         canvas = applyBrightness(canvas, operation);
         break;
       case "contrast":
+        canvas = applyContrast(canvas, operation);
+        break;
       case "rotate":
       case "scale":
         throw new Error(`Operation not yet implemented: ${operation.type}`);
