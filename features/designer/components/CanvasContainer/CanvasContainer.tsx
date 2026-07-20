@@ -155,7 +155,7 @@ export function CanvasContainer() {
               )}
               {objects.map((object) => {
                 const asset = assets.find((a) => a.id === object.assetId);
-                if (!asset) return null;
+                if (!asset || object.hidden) return null;
                 return (
                   <PlacedObject
                     key={object.id}

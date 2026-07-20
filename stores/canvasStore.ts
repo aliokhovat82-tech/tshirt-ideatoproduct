@@ -87,11 +87,18 @@ export const useCanvasStore = create<CanvasState>((set) => ({
       return { objects };
     }),
   toggleHidden: (id) =>
-    set((state) => ({
-      objects: state.objects.map((o) =>
+    set((state) => {
+      const objects = state.objects.map((o) =>
         o.id === id ? { ...o, hidden: !o.hidden } : o,
-      ),
-    })),
+      );
+      const toggled = objects.find((o) => o.id === id);
+      // A hidden object can't stay selected — nothing would show handles for.
+      const selectedObjectId =
+        toggled?.hidden && state.selectedObjectId === id
+          ? null
+          : state.selectedObjectId;
+      return { objects, selectedObjectId };
+    }),
   toggleLocked: (id) =>
     set((state) => ({
       objects: state.objects.map((o) =>

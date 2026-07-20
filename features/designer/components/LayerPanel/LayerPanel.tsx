@@ -11,6 +11,7 @@ export function LayerPanel() {
   const reorderObjects = useCanvasStore((s) => s.reorderObjects);
   const bringForward = useCanvasStore((s) => s.bringForward);
   const sendBackward = useCanvasStore((s) => s.sendBackward);
+  const toggleHidden = useCanvasStore((s) => s.toggleHidden);
   const assets = useAssetsStore((s) => s.assets);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
@@ -65,10 +66,22 @@ export function LayerPanel() {
                 <img
                   src={asset.objectUrl}
                   alt=""
-                  className="h-6 w-6 shrink-0 rounded object-cover"
+                  className={`h-6 w-6 shrink-0 rounded object-cover ${
+                    object.hidden ? "opacity-40" : ""
+                  }`}
                 />
               )}
-              <span className="truncate">{object.name}</span>
+              <span className={`truncate ${object.hidden ? "opacity-40" : ""}`}>
+                {object.name}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleHidden(object.id)}
+              title={object.hidden ? "Show layer" : "Hide layer"}
+              className="shrink-0 rounded p-1 text-xs text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            >
+              {object.hidden ? "Show" : "Hide"}
             </button>
             <button
               type="button"
