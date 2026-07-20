@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useAssetsStore } from "@/stores/assetsStore";
 import { useCanvasStore } from "@/stores/canvasStore";
 
@@ -7,7 +8,9 @@ export function LayerPanel() {
   const objects = useCanvasStore((s) => s.objects);
   const selectedObjectId = useCanvasStore((s) => s.selectedObjectId);
   const selectObject = useCanvasStore((s) => s.selectObject);
+  const reorderObjects = useCanvasStore((s) => s.reorderObjects);
   const assets = useAssetsStore((s) => s.assets);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   if (objects.length === 0) {
     return (
@@ -18,16 +21,33 @@ export function LayerPanel() {
   }
 
   // Topmost layer (rendered last / on top) shown first, matching every
-  // other design tool's layer list convention.
+  // other design tool's layer list convention. Display index and store
+  // index are mirror images of each other: displayIndex = lastIndex -
+  // storeIndex.
+  const lastIndex = objects.length - 1;
   const layersTopFirst = [...objects].reverse();
+
+  const handleDrop = (dropDisplayIndex: number) => {
+    if (draggedIndex === null || draggedIndex === dropDisplayIndex) return;
+    reorderObjects(lastIndex - draggedIndex, lastIndex - dropDisplayIndex);
+    setDraggedIndex(null);
+  };
 
   return (
     <ul className="flex flex-col gap-1">
-      {layersTopFirst.map((object) => {
+      {layersTopFirst.map((object, displayIndex) => {
         const asset = assets.find((a) => a.id === object.assetId);
         const isSelected = object.id === selectedObjectId;
         return (
-          <li key={object.id}>
+          <li
+            key={object.id}
+            draggable
+            onDragStart={() => setDraggedIndex(displayIndex)}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => handleDrop(displayIndex)}
+            onDragEnd={() => setDraggedIndex(null)}
+            className="cursor-grab active:cursor-grabbing"
+          >
             <button
               type="button"
               onClick={() => selectObject(object.id)}
