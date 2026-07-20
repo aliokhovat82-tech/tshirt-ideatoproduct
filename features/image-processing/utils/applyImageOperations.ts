@@ -1,5 +1,6 @@
 import type { ImageOperation } from "@/features/image-processing/types/ImageOperation";
 import { getBackgroundRemovalProvider } from "@/features/image-processing/services/backgroundRemoval/getBackgroundRemovalProvider";
+import { applyCrop } from "@/features/image-processing/utils/applyCrop";
 
 function sourceToCanvas(source: HTMLImageElement): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
@@ -28,6 +29,8 @@ export async function applyImageOperations(
         canvas = await getBackgroundRemovalProvider().removeBackground(canvas);
         break;
       case "crop":
+        canvas = applyCrop(canvas, operation);
+        break;
       case "brightness":
       case "contrast":
       case "rotate":
