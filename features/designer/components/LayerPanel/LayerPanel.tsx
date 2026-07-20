@@ -9,6 +9,7 @@ export function LayerPanel() {
   const selectedObjectId = useCanvasStore((s) => s.selectedObjectId);
   const selectObject = useCanvasStore((s) => s.selectObject);
   const reorderObjects = useCanvasStore((s) => s.reorderObjects);
+  const bringForward = useCanvasStore((s) => s.bringForward);
   const assets = useAssetsStore((s) => s.assets);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
@@ -23,7 +24,8 @@ export function LayerPanel() {
   // Topmost layer (rendered last / on top) shown first, matching every
   // other design tool's layer list convention. Display index and store
   // index are mirror images of each other: displayIndex = lastIndex -
-  // storeIndex.
+  // storeIndex. "Bring forward" (higher store index) means moving UP the
+  // display list (toward display index 0).
   const lastIndex = objects.length - 1;
   const layersTopFirst = [...objects].reverse();
 
@@ -46,12 +48,12 @@ export function LayerPanel() {
             onDragOver={(e) => e.preventDefault()}
             onDrop={() => handleDrop(displayIndex)}
             onDragEnd={() => setDraggedIndex(null)}
-            className="cursor-grab active:cursor-grabbing"
+            className="flex cursor-grab items-center gap-1 active:cursor-grabbing"
           >
             <button
               type="button"
               onClick={() => selectObject(object.id)}
-              className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm ${
+              className={`flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm ${
                 isSelected
                   ? "bg-foreground text-background"
                   : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
@@ -66,6 +68,15 @@ export function LayerPanel() {
                 />
               )}
               <span className="truncate">{object.name}</span>
+            </button>
+            <button
+              type="button"
+              disabled={displayIndex === 0}
+              onClick={() => bringForward(object.id)}
+              title="Bring forward"
+              className="shrink-0 rounded p-1 text-zinc-500 hover:bg-zinc-100 disabled:opacity-30 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            >
+              ↑
             </button>
           </li>
         );
