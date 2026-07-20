@@ -10,6 +10,7 @@ export function LayerPanel() {
   const selectObject = useCanvasStore((s) => s.selectObject);
   const reorderObjects = useCanvasStore((s) => s.reorderObjects);
   const bringForward = useCanvasStore((s) => s.bringForward);
+  const sendBackward = useCanvasStore((s) => s.sendBackward);
   const assets = useAssetsStore((s) => s.assets);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
@@ -77,6 +78,15 @@ export function LayerPanel() {
               className="shrink-0 rounded p-1 text-zinc-500 hover:bg-zinc-100 disabled:opacity-30 dark:text-zinc-400 dark:hover:bg-zinc-800"
             >
               ↑
+            </button>
+            <button
+              type="button"
+              disabled={displayIndex === layersTopFirst.length - 1}
+              onClick={() => sendBackward(object.id)}
+              title="Send backward"
+              className="shrink-0 rounded p-1 text-zinc-500 hover:bg-zinc-100 disabled:opacity-30 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            >
+              ↓
             </button>
           </li>
         );
