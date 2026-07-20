@@ -17,10 +17,14 @@ function PercentField({
   label,
   valuePercent,
   onChange,
+  min = 1,
+  max = 500,
 }: {
   label: string;
   valuePercent: number;
   onChange: (percent: number) => void;
+  min?: number;
+  max?: number;
 }) {
   return (
     <label className="flex items-center justify-between text-sm">
@@ -28,8 +32,8 @@ function PercentField({
       <div className="flex items-center gap-1">
         <input
           type="number"
-          min={1}
-          max={500}
+          min={min}
+          max={max}
           value={Math.round(valuePercent)}
           onChange={(e) => {
             const parsed = Number(e.target.value);
@@ -80,13 +84,19 @@ export function PropertyPanel() {
 
   return (
     <div className="flex flex-col gap-3">
-      <PropertyRow
+      <PercentField
         label="Position X"
-        value={`${Math.round(object.x * 100)}%`}
+        valuePercent={object.x * 100}
+        onChange={(percent) => updateObject(object.id, { x: percent / 100 })}
+        min={-50}
+        max={150}
       />
-      <PropertyRow
+      <PercentField
         label="Position Y"
-        value={`${Math.round(object.y * 100)}%`}
+        valuePercent={object.y * 100}
+        onChange={(percent) => updateObject(object.id, { y: percent / 100 })}
+        min={-50}
+        max={150}
       />
       <PercentField
         label="Width"
