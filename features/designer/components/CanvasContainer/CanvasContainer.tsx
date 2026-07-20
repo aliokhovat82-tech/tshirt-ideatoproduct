@@ -39,6 +39,7 @@ export function CanvasContainer() {
   const objects = useCanvasStore((s) => s.objects);
   const selectedObjectId = useCanvasStore((s) => s.selectedObjectId);
   const selectObject = useCanvasStore((s) => s.selectObject);
+  const removeObject = useCanvasStore((s) => s.removeObject);
   const assets = useAssetsStore((s) => s.assets);
 
   const mockupUrl = getGarmentMockupUrl(garmentTypeId, garmentColorSlug, side);
@@ -81,6 +82,27 @@ export function CanvasContainer() {
     transformer.nodes(selectedNode ? [selectedNode] : []);
     transformer.getLayer()?.batchDraw();
   }, [selectedObjectId, objects, nodeVersion]);
+
+  // Keyboard delete for the selected object. Guards against firing while
+  // typing in a form field (none exist in the Designer yet, but Phase 9's
+  // Property Panel will add them).
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isEditableTarget =
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable;
+      if (isEditableTarget || !selectedObjectId) return;
+
+      if (e.key === "Delete" || e.key === "Backspace") {
+        e.preventDefault();
+        removeObject(selectedObjectId);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedObjectId, removeObject]);
 
   const handleStagePointerDown = (
     e: KonvaEventObject<MouseEvent | TouchEvent>,
