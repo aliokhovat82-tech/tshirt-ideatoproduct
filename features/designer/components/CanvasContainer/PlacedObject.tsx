@@ -15,10 +15,14 @@ export function PlacedObject({
   object,
   asset,
   size,
+  onSelect,
+  registerNode,
 }: {
   object: CanvasObject;
   asset: Asset;
   size: number;
+  onSelect: () => void;
+  registerNode: (id: string, node: Konva.Image | null) => void;
 }) {
   const image = useHtmlImage(asset.objectUrl);
   const nodeRef = useRef<Konva.Image>(null);
@@ -31,6 +35,15 @@ export function PlacedObject({
     nodeRef.current?.getLayer()?.draw();
   }, [image]);
 
+  // nodeRef only attaches once the KonvaImage below actually mounts, which
+  // doesn't happen until `image` finishes loading (see the early return) —
+  // so this must also depend on `image`, or the node never re-registers
+  // once it becomes available.
+  useEffect(() => {
+    registerNode(object.id, nodeRef.current);
+    return () => registerNode(object.id, null);
+  }, [object.id, registerNode, image]);
+
   if (!image) return null;
 
   const width = object.width * size;
@@ -40,6 +53,22 @@ export function PlacedObject({
     updateObject(object.id, {
       x: e.target.x() / size,
       y: e.target.y() / size,
+    });
+  };
+
+  const handleTransformEnd = () => {
+    const node = nodeRef.current;
+    if (!node) return;
+    const scaleX = node.scaleX();
+    const scaleY = node.scaleY();
+    node.scaleX(1);
+    node.scaleY(1);
+    updateObject(object.id, {
+      x: node.x() / size,
+      y: node.y() / size,
+      width: (node.width() * scaleX) / size,
+      height: (node.height() * scaleY) / size,
+      rotation: node.rotation(),
     });
   };
 
@@ -56,6 +85,9 @@ export function PlacedObject({
       rotation={object.rotation}
       draggable
       onDragEnd={handleDragEnd}
+      onTransformEnd={handleTransformEnd}
+      onClick={onSelect}
+      onTap={onSelect}
     />
   );
 }
