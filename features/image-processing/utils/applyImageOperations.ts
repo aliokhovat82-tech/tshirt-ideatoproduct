@@ -1,4 +1,5 @@
 import type { ImageOperation } from "@/features/image-processing/types/ImageOperation";
+import { getBackgroundRemovalProvider } from "@/features/image-processing/services/backgroundRemoval/getBackgroundRemovalProvider";
 
 function sourceToCanvas(source: HTMLImageElement): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
@@ -19,16 +20,18 @@ export async function applyImageOperations(
   source: HTMLImageElement,
   operations: ImageOperation[],
 ): Promise<HTMLCanvasElement> {
-  const canvas = sourceToCanvas(source);
+  let canvas = sourceToCanvas(source);
 
   for (const operation of operations) {
     switch (operation.type) {
+      case "backgroundRemoval":
+        canvas = await getBackgroundRemovalProvider().removeBackground(canvas);
+        break;
       case "crop":
       case "brightness":
       case "contrast":
       case "rotate":
       case "scale":
-      case "backgroundRemoval":
         throw new Error(`Operation not yet implemented: ${operation.type}`);
       default: {
         const exhaustive: never = operation;
