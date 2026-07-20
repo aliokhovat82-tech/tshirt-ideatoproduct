@@ -12,6 +12,7 @@ export function LayerPanel() {
   const bringForward = useCanvasStore((s) => s.bringForward);
   const sendBackward = useCanvasStore((s) => s.sendBackward);
   const toggleHidden = useCanvasStore((s) => s.toggleHidden);
+  const toggleLocked = useCanvasStore((s) => s.toggleLocked);
   const assets = useAssetsStore((s) => s.assets);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
@@ -54,7 +55,9 @@ export function LayerPanel() {
           >
             <button
               type="button"
-              onClick={() => selectObject(object.id)}
+              onClick={() => {
+                if (!object.locked) selectObject(object.id);
+              }}
               className={`flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm ${
                 isSelected
                   ? "bg-foreground text-background"
@@ -82,6 +85,14 @@ export function LayerPanel() {
               className="shrink-0 rounded p-1 text-xs text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
             >
               {object.hidden ? "Show" : "Hide"}
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleLocked(object.id)}
+              title={object.locked ? "Unlock layer" : "Lock layer"}
+              className="shrink-0 rounded p-1 text-xs text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            >
+              {object.locked ? "Unlock" : "Lock"}
             </button>
             <button
               type="button"

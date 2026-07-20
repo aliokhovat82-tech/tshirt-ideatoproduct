@@ -100,11 +100,18 @@ export const useCanvasStore = create<CanvasState>((set) => ({
       return { objects, selectedObjectId };
     }),
   toggleLocked: (id) =>
-    set((state) => ({
-      objects: state.objects.map((o) =>
+    set((state) => {
+      const objects = state.objects.map((o) =>
         o.id === id ? { ...o, locked: !o.locked } : o,
-      ),
-    })),
+      );
+      const toggled = objects.find((o) => o.id === id);
+      // A locked object can't stay selected — nothing to drag/resize/rotate.
+      const selectedObjectId =
+        toggled?.locked && state.selectedObjectId === id
+          ? null
+          : state.selectedObjectId;
+      return { objects, selectedObjectId };
+    }),
   renameObject: (id, name) =>
     set((state) => ({
       objects: state.objects.map((o) => (o.id === id ? { ...o, name } : o)),

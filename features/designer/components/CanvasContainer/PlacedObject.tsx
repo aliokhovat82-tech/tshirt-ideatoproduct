@@ -83,11 +83,11 @@ export function PlacedObject({
       offsetX={width / 2}
       offsetY={height / 2}
       rotation={object.rotation}
-      draggable
+      draggable={!object.locked}
       onDragEnd={handleDragEnd}
       onTransformEnd={handleTransformEnd}
-      onClick={onSelect}
-      onTap={onSelect}
+      onClick={object.locked ? undefined : onSelect}
+      onTap={object.locked ? undefined : onSelect}
     />
   );
 }
