@@ -3,6 +3,7 @@ import { create } from "zustand";
 export interface CanvasObject {
   id: string;
   assetId: string;
+  name: string;
   // Center position and dimensions, normalized 0-1 relative to the stage
   // size — not absolute pixels, so placement stays correct if the stage
   // is resized (matches the pattern used for crop rects in image-processing).
@@ -11,6 +12,8 @@ export interface CanvasObject {
   width: number;
   height: number;
   rotation: number; // degrees
+  hidden: boolean;
+  locked: boolean;
 }
 
 interface CanvasState {
@@ -23,6 +26,12 @@ interface CanvasState {
   ) => void;
   removeObject: (id: string) => void;
   selectObject: (id: string | null) => void;
+  reorderObjects: (fromIndex: number, toIndex: number) => void;
+  bringForward: (id: string) => void;
+  sendBackward: (id: string) => void;
+  toggleHidden: (id: string) => void;
+  toggleLocked: (id: string) => void;
+  renameObject: (id: string, name: string) => void;
 }
 
 export const useCanvasStore = create<CanvasState>((set) => ({
@@ -46,4 +55,51 @@ export const useCanvasStore = create<CanvasState>((set) => ({
         state.selectedObjectId === id ? null : state.selectedObjectId,
     })),
   selectObject: (id) => set({ selectedObjectId: id }),
+  // Object array order IS stacking order (rendered bottom to top), per
+  // docs/project-architecture.md §3.5 — no separate z-index field needed.
+  reorderObjects: (fromIndex, toIndex) =>
+    set((state) => {
+      const objects = [...state.objects];
+      const [moved] = objects.splice(fromIndex, 1);
+      objects.splice(toIndex, 0, moved);
+      return { objects };
+    }),
+  bringForward: (id) =>
+    set((state) => {
+      const index = state.objects.findIndex((o) => o.id === id);
+      if (index === -1 || index === state.objects.length - 1) return state;
+      const objects = [...state.objects];
+      [objects[index], objects[index + 1]] = [
+        objects[index + 1],
+        objects[index],
+      ];
+      return { objects };
+    }),
+  sendBackward: (id) =>
+    set((state) => {
+      const index = state.objects.findIndex((o) => o.id === id);
+      if (index <= 0) return state;
+      const objects = [...state.objects];
+      [objects[index], objects[index - 1]] = [
+        objects[index - 1],
+        objects[index],
+      ];
+      return { objects };
+    }),
+  toggleHidden: (id) =>
+    set((state) => ({
+      objects: state.objects.map((o) =>
+        o.id === id ? { ...o, hidden: !o.hidden } : o,
+      ),
+    })),
+  toggleLocked: (id) =>
+    set((state) => ({
+      objects: state.objects.map((o) =>
+        o.id === id ? { ...o, locked: !o.locked } : o,
+      ),
+    })),
+  renameObject: (id, name) =>
+    set((state) => ({
+      objects: state.objects.map((o) => (o.id === id ? { ...o, name } : o)),
+    })),
 }));

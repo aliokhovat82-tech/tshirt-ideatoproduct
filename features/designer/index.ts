@@ -4,3 +4,4 @@ export { CanvasContainer } from "./components/CanvasContainer/CanvasContainer";
 export { GarmentTypeSelector } from "./components/GarmentTypeSelector/GarmentTypeSelector";
 export { GarmentColorSelector } from "./components/GarmentColorSelector/GarmentColorSelector";
 export { ImageManagerPanel } from "./components/ImageManagerPanel/ImageManagerPanel";
+export { LayerPanel } from "./components/LayerPanel/LayerPanel";

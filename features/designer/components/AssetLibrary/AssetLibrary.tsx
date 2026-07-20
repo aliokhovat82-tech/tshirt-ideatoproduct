@@ -18,11 +18,14 @@ export function AssetLibrary() {
     const height = DEFAULT_WIDTH_FRACTION / aspectRatio;
     const id = addObject({
       assetId: asset.id,
+      name: asset.name,
       x: 0.5,
       y: 0.5,
       width,
       height,
       rotation: 0,
+      hidden: false,
+      locked: false,
     });
     selectObject(id);
   };

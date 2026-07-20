@@ -5,6 +5,7 @@ import {
   GarmentTypeSelector,
   GarmentColorSelector,
   ImageManagerPanel,
+  LayerPanel,
 } from "@/features/designer";
 
 function ComingSoon({ label }: { label: string }) {
@@ -29,7 +30,7 @@ export default function DesignerPage() {
       canvas={<CanvasContainer />}
       mobileExtraTabs={[{ label: "Images", content: <ImageManagerPanel /> }]}
       panels={{
-        Layers: <ComingSoon label="Layers" />,
+        Layers: <LayerPanel />,
         Properties: <ComingSoon label="Properties" />,
         Garment: (
           <div className="flex flex-col gap-6">
