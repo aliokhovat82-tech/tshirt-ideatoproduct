@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAssetsStore } from "@/stores/assetsStore";
-import { useCanvasStore } from "@/stores/canvasStore";
+import { useCanvasStore, type CanvasObject } from "@/stores/canvasStore";
 
 export function LayerPanel() {
   const objects = useCanvasStore((s) => s.objects);
@@ -13,8 +13,11 @@ export function LayerPanel() {
   const sendBackward = useCanvasStore((s) => s.sendBackward);
   const toggleHidden = useCanvasStore((s) => s.toggleHidden);
   const toggleLocked = useCanvasStore((s) => s.toggleLocked);
+  const renameObject = useCanvasStore((s) => s.renameObject);
   const assets = useAssetsStore((s) => s.assets);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState("");
 
   if (objects.length === 0) {
     return (
@@ -38,46 +41,76 @@ export function LayerPanel() {
     setDraggedIndex(null);
   };
 
+  const startEditing = (object: CanvasObject) => {
+    setEditingId(object.id);
+    setEditingValue(object.name);
+  };
+
+  const commitEditing = () => {
+    const trimmed = editingValue.trim();
+    if (editingId && trimmed) renameObject(editingId, trimmed);
+    setEditingId(null);
+  };
+
   return (
     <ul className="flex flex-col gap-1">
       {layersTopFirst.map((object, displayIndex) => {
         const asset = assets.find((a) => a.id === object.assetId);
         const isSelected = object.id === selectedObjectId;
+        const isEditing = editingId === object.id;
         return (
           <li
             key={object.id}
-            draggable
+            draggable={!isEditing}
             onDragStart={() => setDraggedIndex(displayIndex)}
             onDragOver={(e) => e.preventDefault()}
             onDrop={() => handleDrop(displayIndex)}
             onDragEnd={() => setDraggedIndex(null)}
             className="flex cursor-grab items-center gap-1 active:cursor-grabbing"
           >
-            <button
-              type="button"
-              onClick={() => {
-                if (!object.locked) selectObject(object.id);
-              }}
-              className={`flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm ${
-                isSelected
-                  ? "bg-foreground text-background"
-                  : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-              }`}
-            >
-              {asset && (
-                // eslint-disable-next-line @next/next/no-img-element -- blob: object URLs aren't remote assets next/image can optimize
-                <img
-                  src={asset.objectUrl}
-                  alt=""
-                  className={`h-6 w-6 shrink-0 rounded object-cover ${
-                    object.hidden ? "opacity-40" : ""
-                  }`}
-                />
-              )}
-              <span className={`truncate ${object.hidden ? "opacity-40" : ""}`}>
-                {object.name}
-              </span>
-            </button>
+            {isEditing ? (
+              <input
+                autoFocus
+                value={editingValue}
+                onChange={(e) => setEditingValue(e.target.value)}
+                onBlur={commitEditing}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") commitEditing();
+                  if (e.key === "Escape") setEditingId(null);
+                }}
+                className="min-w-0 flex-1 rounded-md border border-zinc-300 px-2 py-1 text-sm dark:border-zinc-600 dark:bg-zinc-800"
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  if (!object.locked) selectObject(object.id);
+                }}
+                onDoubleClick={() => startEditing(object)}
+                title="Double-click to rename"
+                className={`flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm ${
+                  isSelected
+                    ? "bg-foreground text-background"
+                    : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                }`}
+              >
+                {asset && (
+                  // eslint-disable-next-line @next/next/no-img-element -- blob: object URLs aren't remote assets next/image can optimize
+                  <img
+                    src={asset.objectUrl}
+                    alt=""
+                    className={`h-6 w-6 shrink-0 rounded object-cover ${
+                      object.hidden ? "opacity-40" : ""
+                    }`}
+                  />
+                )}
+                <span
+                  className={`truncate ${object.hidden ? "opacity-40" : ""}`}
+                >
+                  {object.name}
+                </span>
+              </button>
+            )}
             <button
               type="button"
               onClick={() => toggleHidden(object.id)}
