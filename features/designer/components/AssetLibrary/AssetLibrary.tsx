@@ -24,6 +24,7 @@ export function AssetLibrary() {
       width,
       height,
       rotation: 0,
+      opacity: 1,
       hidden: false,
       locked: false,
     });

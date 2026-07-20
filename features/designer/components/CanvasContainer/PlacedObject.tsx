@@ -83,6 +83,7 @@ export function PlacedObject({
       offsetX={width / 2}
       offsetY={height / 2}
       rotation={object.rotation}
+      opacity={object.opacity}
       draggable={!object.locked}
       onDragEnd={handleDragEnd}
       onTransformEnd={handleTransformEnd}

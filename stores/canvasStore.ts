@@ -12,6 +12,7 @@ export interface CanvasObject {
   width: number;
   height: number;
   rotation: number; // degrees
+  opacity: number; // 0-1
   hidden: boolean;
   locked: boolean;
 }
