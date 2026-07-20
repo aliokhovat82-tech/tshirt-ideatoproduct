@@ -4,6 +4,7 @@ import { applyCrop } from "@/features/image-processing/utils/applyCrop";
 import { applyBrightness } from "@/features/image-processing/utils/applyBrightness";
 import { applyContrast } from "@/features/image-processing/utils/applyContrast";
 import { applyRotation } from "@/features/image-processing/utils/applyRotation";
+import { applyScale } from "@/features/image-processing/utils/applyScale";
 
 function sourceToCanvas(source: HTMLImageElement): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
@@ -44,7 +45,8 @@ export async function applyImageOperations(
         canvas = applyRotation(canvas, operation);
         break;
       case "scale":
-        throw new Error(`Operation not yet implemented: ${operation.type}`);
+        canvas = applyScale(canvas, operation);
+        break;
       default: {
         const exhaustive: never = operation;
         throw new Error(`Unknown operation: ${JSON.stringify(exhaustive)}`);
