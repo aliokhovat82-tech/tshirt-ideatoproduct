@@ -28,12 +28,23 @@ export function PlacedObject({
   const nodeRef = useRef<Konva.Image>(null);
   const updateObject = useCanvasStore((s) => s.updateObject);
 
-  // The image loads asynchronously; force a redraw once it's ready so the
-  // object actually appears without needing an unrelated re-render to
-  // happen to trigger it (same issue the garment mockup image has).
+  // react-konva does not auto-redraw the layer when a node's props change
+  // from a pure React state update (no direct Konva interaction) — drag,
+  // resize, and rotate look fine without this because Konva's own gesture
+  // handling paints those live, independent of React. But edits coming
+  // from the Property Panel (position/size/opacity typed in directly) have
+  // no such native interaction, so nothing repaints without forcing it here.
   useEffect(() => {
     nodeRef.current?.getLayer()?.draw();
-  }, [image]);
+  }, [
+    image,
+    object.x,
+    object.y,
+    object.width,
+    object.height,
+    object.rotation,
+    object.opacity,
+  ]);
 
   // nodeRef only attaches once the KonvaImage below actually mounts, which
   // doesn't happen until `image` finishes loading (see the early return) —

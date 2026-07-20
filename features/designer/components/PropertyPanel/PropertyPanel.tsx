@@ -2,17 +2,6 @@
 
 import { useCanvasStore } from "@/stores/canvasStore";
 
-function PropertyRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between text-sm">
-      <span className="text-zinc-500 dark:text-zinc-400">{label}</span>
-      <span className="font-medium text-zinc-900 dark:text-zinc-100">
-        {value}
-      </span>
-    </div>
-  );
-}
-
 function PercentField({
   label,
   valuePercent,
@@ -43,6 +32,33 @@ function PercentField({
         />
         <span className="text-zinc-500 dark:text-zinc-400">%</span>
       </div>
+    </label>
+  );
+}
+
+function OpacityField({
+  valuePercent,
+  onChange,
+}: {
+  valuePercent: number;
+  onChange: (percent: number) => void;
+}) {
+  return (
+    <label className="flex flex-col gap-1 text-sm">
+      <div className="flex items-center justify-between">
+        <span className="text-zinc-500 dark:text-zinc-400">Opacity</span>
+        <span className="font-medium text-zinc-900 dark:text-zinc-100">
+          {Math.round(valuePercent)}%
+        </span>
+      </div>
+      <input
+        type="range"
+        min={0}
+        max={100}
+        value={Math.round(valuePercent)}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full"
+      />
     </label>
   );
 }
@@ -108,9 +124,11 @@ export function PropertyPanel() {
         valuePercent={object.height * 100}
         onChange={handleHeightPercent}
       />
-      <PropertyRow
-        label="Opacity"
-        value={`${Math.round(object.opacity * 100)}%`}
+      <OpacityField
+        valuePercent={object.opacity * 100}
+        onChange={(percent) =>
+          updateObject(object.id, { opacity: percent / 100 })
+        }
       />
     </div>
   );
