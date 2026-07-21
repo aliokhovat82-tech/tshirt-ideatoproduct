@@ -41,6 +41,7 @@ export function CanvasContainer() {
   const selectObject = useCanvasStore((s) => s.selectObject);
   const removeObject = useCanvasStore((s) => s.removeObject);
   const undo = useCanvasStore((s) => s.undo);
+  const redo = useCanvasStore((s) => s.redo);
   const assets = useAssetsStore((s) => s.assets);
 
   const mockupUrl = getGarmentMockupUrl(garmentTypeId, garmentColorSlug, side);
@@ -97,7 +98,12 @@ export function CanvasContainer() {
       if (isEditableTarget) return;
 
       const isCtrlOrCmd = e.ctrlKey || e.metaKey;
-      if (isCtrlOrCmd && e.key.toLowerCase() === "z" && !e.shiftKey) {
+      if (isCtrlOrCmd && e.key.toLowerCase() === "z" && e.shiftKey) {
+        e.preventDefault();
+        redo();
+        return;
+      }
+      if (isCtrlOrCmd && e.key.toLowerCase() === "z") {
         e.preventDefault();
         undo();
         return;
@@ -110,7 +116,7 @@ export function CanvasContainer() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedObjectId, removeObject, undo]);
+  }, [selectedObjectId, removeObject, undo, redo]);
 
   const handleStagePointerDown = (
     e: KonvaEventObject<MouseEvent | TouchEvent>,

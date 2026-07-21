@@ -2,13 +2,15 @@
 
 import { useCanvasStore } from "@/stores/canvasStore";
 
-// Select and Duplicate are wired up in later phases/tasks. Delete and
-// Undo are implemented (Tasks 40, 54).
+// Select and Duplicate are wired up in later phases/tasks. Delete, Undo,
+// and Redo are implemented (Tasks 40, 54, 55).
 export function Toolbar() {
   const selectedObjectId = useCanvasStore((s) => s.selectedObjectId);
   const removeObject = useCanvasStore((s) => s.removeObject);
   const canUndo = useCanvasStore((s) => s.history.past.length > 0);
+  const canRedo = useCanvasStore((s) => s.history.future.length > 0);
   const undo = useCanvasStore((s) => s.undo);
+  const redo = useCanvasStore((s) => s.redo);
 
   return (
     <div className="flex flex-col gap-1 p-3">
@@ -53,6 +55,19 @@ export function Toolbar() {
         }`}
       >
         Undo
+      </button>
+      <button
+        type="button"
+        disabled={!canRedo}
+        onClick={redo}
+        title="Redo (Ctrl+Shift+Z)"
+        className={`rounded-md px-3 py-2 text-left text-sm ${
+          canRedo
+            ? "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            : "text-zinc-400 dark:text-zinc-500"
+        }`}
+      >
+        Redo
       </button>
     </div>
   );
