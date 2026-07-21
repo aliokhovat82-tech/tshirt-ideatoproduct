@@ -40,6 +40,7 @@ export function CanvasContainer() {
   const selectedObjectId = useCanvasStore((s) => s.selectedObjectId);
   const selectObject = useCanvasStore((s) => s.selectObject);
   const removeObject = useCanvasStore((s) => s.removeObject);
+  const undo = useCanvasStore((s) => s.undo);
   const assets = useAssetsStore((s) => s.assets);
 
   const mockupUrl = getGarmentMockupUrl(garmentTypeId, garmentColorSlug, side);
@@ -83,9 +84,9 @@ export function CanvasContainer() {
     transformer.getLayer()?.batchDraw();
   }, [selectedObjectId, objects, nodeVersion]);
 
-  // Keyboard delete for the selected object. Guards against firing while
-  // typing in a form field (none exist in the Designer yet, but Phase 9's
-  // Property Panel will add them).
+  // Keyboard delete + undo. Guards against firing while typing in a form
+  // field (Property Panel's inputs, Layer rename). Undo isn't gated on
+  // selection — it's a global history action, not a per-object one.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -93,16 +94,23 @@ export function CanvasContainer() {
         target.tagName === "INPUT" ||
         target.tagName === "TEXTAREA" ||
         target.isContentEditable;
-      if (isEditableTarget || !selectedObjectId) return;
+      if (isEditableTarget) return;
 
-      if (e.key === "Delete" || e.key === "Backspace") {
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+      if (isCtrlOrCmd && e.key.toLowerCase() === "z" && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+        return;
+      }
+
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedObjectId) {
         e.preventDefault();
         removeObject(selectedObjectId);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedObjectId, removeObject]);
+  }, [selectedObjectId, removeObject, undo]);
 
   const handleStagePointerDown = (
     e: KonvaEventObject<MouseEvent | TouchEvent>,
